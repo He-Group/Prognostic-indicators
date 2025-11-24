@@ -1,14 +1,4 @@
 #10x
-library(Seurat)
-library(hdf5r)
-library(ggplot2)
-library(data.table)
-library(dplyr)
-library(Matrix)
-library(SPOTlight)
-library(SingleCellExperiment)
-library(scater)
-library(scran)
 load('D:/项目/olink/result/MR analysis/空转/10X/CRC.Rdata')
 library(imager)
 a <- SpatialFeaturePlot(CRC, features =c("EPCAM"),,pt.size.factor = 2.3, alpha = c(0.1, 1))
@@ -51,3 +41,4 @@ b <- SpatialFeaturePlot(st_a, features =c("CD274"), pt.size.factor = 6,alpha=c(0
 x <- a+b
 x
 dev.off()
+
