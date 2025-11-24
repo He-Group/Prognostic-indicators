@@ -1,51 +1,3 @@
-
-#data cleaning
-library(dplyr)
-library(survival)
-load('D:/项目/olink/ukb.crc.data.Rdata')
-load('D:/项目/olink/ukb.pro.data.Rdata')
-pro <- pro[which(pro$f.eid %in% crc.data$f.eid),]
-class(crc.data$Colorectal.Colorectal_cancer.date)
-Colorectum = "^C1[89]|^C2[01]|^15[34]"
-CRC <- crc.data[grepl(Colorectum,crc.data$Colorectal.Colorectal_cancer_diag_ICD)==TRUE,]
-CRC <- CRC %>%
-  mutate(last_date = coalesce(CRC$death.date, CRC$endpoint.for.death))  #有死亡时间则死亡时间，无死亡时间则最新诊断时间
-CRC$fu_time <- difftime(CRC$last_date, CRC$Colorectal.Colorectal_cancer.date,
-                        units = c("days"))
-CRC <- CRC %>%
-  mutate(OS_event = ifelse(is.na(CRC$death.date), 0, 1),
-         CSS_event = ifelse(grepl(Colorectum,CRC$death.ICD10)==TRUE, 1, 0)) %>%  #生存为0，死亡为1
-  distinct() 
-
-CRC$lag_time <- difftime(CRC$Colorectal.Colorectal_cancer.date, CRC$f.53.0.0,
-                         units = c("days"))
-CRC <- CRC[,c(1:16,232:236,17:231)]
-pro <- merge(CRC[,c(1,3,7,8:11,17:21)],pro,by='f.eid')
-colnames(pro)[1:7] <- c('eidL','diagnosis_date','age_rec','sex','BMI','ethnicity','attending_date')
-colnames(pro)[c(13:22)] <- c('ADAM8','CA6','FUT3_FUT5','MUC13','PTPRN2','SPINT1','STC1','THBS2','TNFRSF10B','VSIG4')
-Colorectum = "^C1[89]|^C2[01]|^15[34]"
-diagnosis <- diagnosis[grepl("^C1[89]|^C2[01]|^15[34]",diagnosis$Diagnosis)==TRUE,]
-diagnosis_min <- diagnosis %>% 
-  group_by(eidL) %>% 
-  filter(Date == min(Date))
-diagnosis_min$tumor_site <- substr(diagnosis_min$Diagnosis,start=1,stop=3)
-diagnosis_CRC <- diagnosis_min[,-4]
-diagnosis_CRC <- unique(diagnosis_CRC)
-diagnosis_CRC <- diagnosis_CRC[order(diagnosis_CRC$tumor_site),]
-diagnosis_CRC <- diagnosis_CRC %>%
-  group_by(eidL) %>%
-  summarise(tumor_site = paste(unique(tumor_site), collapse = ", ")) %>%
-  ungroup()
-UKB_pro <- read.csv('D:/项目/olink/result/加入20例后/UKB_pro.csv')
-UKB_pro <- merge(diagnosis_CRC[c(1,3)],UKB_pro,by='eidL')
-UKB_pro$Site[which(UKB_pro$eidL=='1439226')] <- 2
-UKB_pro$ethnicity_id <- ifelse(UKB_pro$ethnicity=='1001',0,1)
-UKB_pro$age_diag <- UKB_pro$age+UKB_pro$lag_time/365.25
-UKB_pro$exit.time = difftime(UKB_pro$last_date,UKB_pro$attending_date, units = "days")
-UKB_pro <- UKB_pro[,c(1,4,25,5,6,7,2,24,8,3,26,9:23)]
-write.csv(UKB_pro,file= '03_UKB_pro.csv',row.names = F,quote=FALSE)
-
-
 #UKB validation developing
 rt <- read.csv('01_WCH_rt_OS.csv')
 Coef <- read.csv('01_Coef_LASSO_OS.csv')
@@ -303,3 +255,4 @@ legend("topleft",
        cex = 0.9,
        bty = "n")
 dev.off()
+
