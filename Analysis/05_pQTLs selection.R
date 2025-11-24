@@ -6,7 +6,7 @@ loc <- as.data.frame(read_xlsx('D:/项目/olink/result/MR analysis/lasso_gene_lo
 reference.1000G.maf<-read.table("D:/项目/olink/result/MR analysis/共定位参考/reference.1000G.txt",header=T,sep=' ') 
 colnames(reference.1000G.maf)[3] <- 'BP_hg19'
 proteins <- read.table('D:/项目/olink/result/MR analysis/lasso proteins.txt',sep='\t',header=T)
-pathS <- "D:/项目/olink/result/MR analysis/pQTL_summary/Sun/cis_coloc"
+pathS <- "D:/项目/olink/result/MR analysis/pQTL_summary/S/cis_coloc"
 fileNamesS <- dir(pathS) 
 fileNamesS <- fileNamesS[fileNamesS %in% paste(proteins$Proteins,'.regenie',sep='')]
 filePathS <- sapply(fileNamesS, function(x){ 
@@ -15,7 +15,7 @@ dataS <- lapply(filePathS, function(x){
   read.table(x,header=T,sep='')})  
 names(dataS) <- gsub(".regenie", "", names(dataS))
 
-#Sun
+#01
 options(ieugwasr_api = 'gwas-api.mrcieu.ac.uk/')
 pQTL <- data.frame()
 for (i in 1:length(fileNamesS)){
@@ -43,8 +43,8 @@ for (i in 1:length(fileNamesS)){
     pQTL <- rbind(pQTL,input)}}
 pQTL$pval.exposure <- 10^-pQTL$LOG10P
 
-#Pietzner
-pathP <- "D:/项目/olink/result/MR analysis/pQTL_summary/Pietzner"
+#02
+pathP <- "D:/项目/olink/result/MR analysis/pQTL_summary/P"
 fileNamesP <- dir(pathP) 
 fileNamesP <- fileNamesP[fileNamesP %in% proteins$Proteins]
 filePathP <- sapply(fileNamesP, function(x){ 
@@ -86,8 +86,8 @@ for (x in 1:length(filePathP)){
     pQTL_P_1e10_0.001 <- rbind(pQTL_P_1e10_0.001,input_1e10_0.001)}}
 
 
-#Gudjonsson
-pathG <- "D:/项目/olink/result/MR analysis/pQTL_summary/Gudjonsson"
+#03
+pathG <- "D:/项目/olink/result/MR analysis/pQTL_summary/G"
 fileNamesG <- dir(pathG) 
 filePathG <- sapply(fileNamesG, function(x){ 
   paste(pathG,x,sep='/')})
@@ -123,8 +123,8 @@ for (i in 1:length(fileNamesS)){
 pQTL$pval.exposure <- 10^-pQTL$LOG10P
 
 
-#Sun_1
-pathS1 <- "D:/项目/olink/result/MR analysis/pQTL_summary/Sun_1"
+#04
+pathS1 <- "D:/项目/olink/result/MR analysis/pQTL_summary/S1"
 fileNamesS1 <- dir(pathS1) 
 fileNamesS1 <- fileNamesS1[fileNamesS1 %in% paste(proteins$Proteins,'.tsv',sep='')]
 filePathS1 <- sapply(fileNamesS1, function(x){ 
@@ -154,8 +154,8 @@ pQTL_Sun1 <- pQTL_Sun1[,-14]
 colnames(pQTL_Sun1)[13] <- 'pval.exposure'
 
 
-#Kalnapenkis
-pathK <- "D:/项目/olink/result/MR analysis/pQTL_summary/Kalnapenkis"
+#05
+pathK <- "D:/项目/olink/result/MR analysis/pQTL_summary/K"
 fileNamesK <- dir(pathK) 
 fileNamesK <- fileNamesK[fileNamesK %in% paste(proteins$Proteins,'.tsv',sep='')]
 filePathK <- sapply(fileNamesK, function(x){ 
@@ -218,18 +218,4 @@ for (i in 1:nrow(pQTL)){
 pQTL$R2 <- 2*pQTL$eaf.exposure*(1-pQTL$eaf.exposure)*pQTL$beta.exposure^2
 pQTL$F <- pQTL$beta.exposure^2/pQTL$se.exposure^2
 pQTL[pQTL$Study=='Sun',11] <- 'Sun2'
-
-pQTLS1 <- pQTL[pQTL$Study=='Sun1',]
-pQTLS2 <- pQTL[pQTL$Study=='Sun2',]
-pQTLP <- pQTL[pQTL$Study=='Pietzner',] 
-pQTLK <- pQTL[pQTL$Study=='Kalnapenkis',] 
-protein <- unique(pQTL$Protein)
-pQTL <- data.frame()
-for (i in 1:length(protein)){
-  a <-  pQTLS2[which(pQTLS2$Protein==protein[i]),]
-  if (!(nrow(a)==0)){
-    a$sumR2 <- sum(a$R2)
-    pQTL <- rbind(pQTL,a)
-  }}
-write.table(LDlink,file='05_LDlink.csv',sep=",",row.names=F,quote=F)
 write.table(pQTL,file='05_pQTLs.csv',sep=",",row.names=F,quote=F)
