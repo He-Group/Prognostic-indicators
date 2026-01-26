@@ -42,4 +42,9 @@ cox_DFS$outcome <- 'CRC DFS'
 
 across <- rbind(cox_OS,cox_DFS)
 across$FDR_across <- p.adjust(across$pvalue,method = 'fdr')
+OS <- cox_OS[which(cox_OS$Assay %in% c('MUC13','TNFRSF10B','STC1','ADAM8','FUT3_FUT5','DRAXIN','PTPRN2','SLIT2')),]
+DFS <- cox_DFS[which(cox_DFS$Assay %in% c('CD109','BST1','FCER2','CD274','GGT1','KEL','CA6','CLPS','THBS2','PTS','VSIG4')),]
+OS$FDR <- p.adjust(OS$pvalue,method='fdr')
+DFS$FDR <- p.adjust(DFS$pvalue,method='fdr')
 write.table(across, file="04_cox_result.csv",col.names = T,row.names = F,sep=",",quote=FALSE)
+
