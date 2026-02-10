@@ -77,7 +77,7 @@ for (i in 8:10){
     action= 1
   )  
   mydata <- mydata[which(mydata$mr_keep==TRUE),]
-  mydata$MAF <- ifelse(mydata$eaf.exposure>0.5, mydata$eaf.exposure, 1-mydata$eaf.exposure)
+  mydata$MAF <- ifelse(mydata$eaf.exposure>0.5, 1-mydata$eaf.exposure, mydata$eaf.exposure)
   mydata = mydata[!duplicated(mydata$SNP),]
   re = coloc.abf(dataset1 = list(beta=mydata$beta.exposure, varbeta=mydata$se.exposure^2, snp=mydata$SNP, type="quant" ,N=npqtl), 
                  dataset2 = list(beta=mydata$beta.outcome,varbeta=mydata$se.outcome^2,snp=mydata$SNP, type="quant" ,N=ngwas),
@@ -141,4 +141,5 @@ lap <- as.data.frame(result[["MRcorrection"]])
 lap$corrected_HR <- exp(lap$corrected_effect)
 lap$corrected_HR_LCI<- exp(log(lap$corrected_HR) - lap$corrected_effect_se * 1.96)
 lap$corrected_HR_UCI <- exp(log(lap$corrected_HR) + lap$corrected_effect_se * 1.96)
+
 save(lap,file='07_mrlap_OS.Rdata')
