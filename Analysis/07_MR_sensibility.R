@@ -68,6 +68,7 @@ for (i in 8:10){
   pqtl$pos <- a[,2]
   pqtl$id.exposure <- 'pQTL'
   pqtl$exposure <- 'pQTL meta'
+  pqtl$pval.exposure[pqtl$pval.exposure == 0] <- 1E-308
   input <- merge(pqtl,chd,by='pos')
   exp <- input[,c(1:21)]
   mydata <- harmonise_data(
@@ -84,7 +85,6 @@ for (i in 8:10){
   result1 <- as.data.frame(re[["summary"]])
   result1 <- as.data.frame(t(result1))
   result <- rbind(cbind(result1,co[,c(1:4)]),result)
-  mydata$pval.exposure[pqtl$pval.exposure == 0] <- 1E-308
   write.table(mydata[,c(1:3,6,8,15,16,28,32,41)],"D:/项目/olink/result/MR analysis/共定位/pqtl_fn.txt",sep="\t",row.names=F,quote=F)
   write.table(mydata[,c(1,4,5,7,9,15,16,18,19,41)],"D:/项目/olink/result/MR analysis/共定位/gwas_fn.txt",sep="\t",row.names=F,quote=F)
   marker_col="SNP"
@@ -143,4 +143,5 @@ lap$corrected_HR_LCI<- exp(log(lap$corrected_HR) - lap$corrected_effect_se * 1.9
 lap$corrected_HR_UCI <- exp(log(lap$corrected_HR) + lap$corrected_effect_se * 1.96)
 
 save(lap,file='07_mrlap_OS.Rdata')
+
 
